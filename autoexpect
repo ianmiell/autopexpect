@@ -8,15 +8,104 @@ conservative = False
 promptmode = False
 option_keys = ''
 
+
+# args TODO
+
+def input(c):
+	global userbuf
+	global lastkey
+	pexpect.send(c)
+	userbuf += lastkey
+	lastkey = c
+
+def input_null():
+	global lastkey
+	global userbuf
+	global procbuf
+	global echoing
+	# TODO
+	
+
+def output(s):
+	global lastkey
+	global procbuf
+	global userbuf
+	global echoing
+	# TODO
+
+def expand(s):
+	# TODO
+	return s
+
+def expcmd(s):
+	global promptmode
+	if promptmode:
+		pass
+
+def cmd(s):
+	global fd
+	# TODO
+
+def verbose_send_user(s):
+	global verbose
+	# TODO
+
+def ctoggle():
+	global conservative
+	global send_style
+	if conservative:
+		cmd "# conservative mode off - adding no delays"
+		verbose_send_user "conservative mode off\n"
+		conservative = False
+		send_style = ""
+	else:
+		cmd "# prompt mode on - adding delays"
+		verbose_send_user "conservative mode off\n"
+		conservative = True
+		send_style = ' -s'
+
+def ptoggle():
+	global promptmode
+	if promptmode:
+		cmd "# prompt mode off - now looking for complete output"
+		verbose_send_user "prompt mode off\n"
+		promptmode = False
+	else:
+		cmd "# prompt mode on - now looking only for prompts"
+		verbose_send_user "prompt mode on\n"
+		promptmode = True
+
+def quote():
+	pass
+	#TODO
+
+# SCRIPT STARTS
+# TODO - open file, set fd
+# TODO - chmod +x file
+# TODO - set up expectpath(needed?)
+# TODO - default script
+
+cmd('set timeout -1')
+if conservative:
+	send_style = ' -s'
+	cmd('set send_slow{1 .1}')
+else:
+	send_style = ''
+
+# TODO - spawn eval
+
+cmd('match_max 100000')
+	
 # globals
 lastkey = ""
 procbuf = ""
 userbuf = ""
 echoing = False
 
-# args TODO
 
-def input(c):
+# TODO - eval interact
+#pexpect.interact(option_keys):
+	
 	
 
 ##!/bin/sh
