@@ -16,7 +16,8 @@ def input_filter(c):
 			userbuf+=c
 	else:
 		userbuf+=c
-	sys.stdout.write(c)
+	if userbuf != '':
+		sys.stdout.write(c)
 	return c
 
 def output_filter(o):
@@ -43,7 +44,13 @@ def cmd(s):
 
 fd = open(filename,'w')
 cmd('import pexpect')
+cmd('import sys')
+cmd('import os')
+cmd('import time')
 cmd("""child=pexpect.spawn('/bin/bash')""")
+cmd("""child.logfile=sys.stdout""")
+cmd("""os.system('stty sane')""")
+cmd("""os.system('clear')""")
 
 # globals
 lastkey = ""
@@ -53,4 +60,5 @@ userbuf = ""
 child = pexpect.spawn('/bin/bash')
 child.interact(input_filter=input_filter,output_filter=output_filter)
 child.close()
+print '\r\nScript written to ' + filename
 	
