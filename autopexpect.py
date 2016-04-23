@@ -32,7 +32,7 @@ def output_filter(o):
 	outputbuf+=o
 	# Newline detected
 	if userbuf=='' and outputbuf!='':
-		outputbuf_list = outputbuf.split()
+		outputbuf_list = outputbuf.split('\n')
 		for line in outputbuf_list:
 			expcmd(line)
 		outputbuf=''
@@ -41,17 +41,17 @@ def output_filter(o):
 
 def expcmd(s):
 	s=regsub(s)
-	cmd('child.expect_exact(r"""' + s + '""")')
+	cmd('child.expect_exact("""' + s + '""")')
 
 
 def sendcmd(s,elapsed_time):
 	s=regsub(s)
 	cmd('time.sleep(' + str(elapsed_time) + ')')
-	cmd('child.sendline(r"""' + s + '""")')
+	cmd('child.sendline("""' + s + '""")')
 
 
 def regsub(s):
-	s=s.replace('\\\\','\\\\\\\\')
+	s=s.replace('\\','\\\\')
 	s=s.replace('\r','\\r')
 	s=s.replace('"','\\"')
 	s=s.replace('\\\[','\\\[')
@@ -87,10 +87,13 @@ cmd("""child.logfile=sys.stdout""")
 
 
 child = pexpect.spawn('/bin/bash')
+# A little bit of grace for the prompt to appear
+time.sleep(2)
 start_time = time.time()
 child.interact(input_filter=input_filter,output_filter=output_filter)
 # Finish with a return.
 sendcmd('',0)
+cmd('print "autopexpect script complete"')
 child.close()
 print '\r\nScript written to: ' + filename
 print '\r\nRun it with: ./' + filename
