@@ -1,16 +1,21 @@
 #!/usr/bin/env python
-
 import pexpect
 import sys
 import string
+import time
+import os
+import stat
 
-filename = 'script.py'
 
 def input_filter(c):
 	global userbuf
+	global start_time
+	global elapsed_time
 	if len(c) == 1:
 		if ord(c) == 13:
-			sendcmd(userbuf)
+			elapsed_time = time.time() - start_time
+			start_time = time.time()
+			sendcmd(userbuf,elapsed_time)
 			userbuf = ''
 		else:
 			userbuf+=c
@@ -19,6 +24,7 @@ def input_filter(c):
 	if userbuf != '':
 		sys.stdout.write(c)
 	return c
+
 
 def output_filter(o):
 	global outputbuf
@@ -31,11 +37,15 @@ def output_filter(o):
 		outputbuf=''
 	return o
 
+
 def expcmd(s):
 	cmd('child.expect_exact(r"""' + s + '""")')
 
-def sendcmd(s):
+
+def sendcmd(s,elapsed_time):
+	cmd('time.sleep(' + str(elapsed_time) + ')')
 	cmd('child.sendline(r"""' + s + '""")')
+
 
 def cmd(s):
 	global fd
@@ -43,22 +53,29 @@ def cmd(s):
 
 
 fd = open(filename,'w')
+os.chmod(filename,stat.S_IRWXU)
+cmd('#!/usr/bin/env python')
 cmd('import pexpect')
 cmd('import sys')
 cmd('import os')
 cmd('import time')
 cmd("""child=pexpect.spawn('/bin/bash')""")
 cmd("""child.logfile=sys.stdout""")
-cmd("""os.system('stty sane')""")
-cmd("""os.system('clear')""")
 
 # globals
-lastkey = ""
-outputbuf = ""
-userbuf = ""
+filename     = 'script.py'
+lastkey      = ""
+outputbuf    = ""
+userbuf      = ""
+start_time   = 0
+elapsed_time = 0
 
 child = pexpect.spawn('/bin/bash')
+start_time = time.time()
 child.interact(input_filter=input_filter,output_filter=output_filter)
+# Finish with a return.
+sendcmd('',0)
 child.close()
-print '\r\nScript written to ' + filename
-	
+print '\r\nScript written to: ' + filename
+print '\r\nRun it with: ./' + filename
+
