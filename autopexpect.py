@@ -51,7 +51,15 @@ def cmd(s):
 	global fd
 	fd.write(s+'\n')
 
+# globals
+filename     = 'script.py'
+lastkey      = ""
+outputbuf    = ""
+userbuf      = ""
+start_time   = 0
+elapsed_time = 0
 
+# Script starts
 fd = open(filename,'w')
 os.chmod(filename,stat.S_IRWXU)
 cmd('#!/usr/bin/env python')
@@ -62,13 +70,6 @@ cmd('import time')
 cmd("""child=pexpect.spawn('/bin/bash')""")
 cmd("""child.logfile=sys.stdout""")
 
-# globals
-filename     = 'script.py'
-lastkey      = ""
-outputbuf    = ""
-userbuf      = ""
-start_time   = 0
-elapsed_time = 0
 
 child = pexpect.spawn('/bin/bash')
 start_time = time.time()
