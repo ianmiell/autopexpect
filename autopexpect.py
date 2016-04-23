@@ -20,7 +20,8 @@ def input_filter(c):
 		else:
 			userbuf+=c
 	else:
-		userbuf+=c
+		pass
+		#userbuf+=c
 	if userbuf != '':
 		sys.stdout.write(c)
 	return c
@@ -39,17 +40,29 @@ def output_filter(o):
 
 
 def expcmd(s):
+	s=regsub(s)
 	cmd('child.expect_exact(r"""' + s + '""")')
 
 
 def sendcmd(s,elapsed_time):
+	s=regsub(s)
 	cmd('time.sleep(' + str(elapsed_time) + ')')
 	cmd('child.sendline(r"""' + s + '""")')
+
+
+def regsub(s):
+	s=s.replace('\\\\','\\\\\\\\')
+	s=s.replace('\r','\\r')
+	s=s.replace('"','\\"')
+	s=s.replace('\\\[','\\\[')
+	s=s.replace('\\\]','\\\]')
+	return s
 
 
 def cmd(s):
 	global fd
 	fd.write(s+'\n')
+
 
 # globals
 filename     = 'script.py'
@@ -59,10 +72,12 @@ userbuf      = ""
 start_time   = 0
 elapsed_time = 0
 
+
 # Script starts
 fd = open(filename,'w')
 os.chmod(filename,stat.S_IRWXU)
 cmd('#!/usr/bin/env python')
+cmd('# -*- coding: utf-8 -*-')
 cmd('import pexpect')
 cmd('import sys')
 cmd('import os')
